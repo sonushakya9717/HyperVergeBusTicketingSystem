@@ -10,7 +10,7 @@ const NoTicketFound = () => {
             <h5 className="card-title">Book The Tickets</h5>
             <p className="card-text">Travel The World</p>
         </div>
-        <img className="card-img-bottom" style={{height: "30rem"}} src={travelFast} alt="Card image cap" />
+        <img className="card-img-bottom" style={{height: "30rem"}} src={travelFast} alt="Card cap" />
     </div>
         </Fragment>
         )

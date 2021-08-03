@@ -16,7 +16,7 @@ const initialState = {
 
 
 
-export default function(state = initialState, action) {
+const tickets = (state = initialState, action) => {
     const { type, payload } = action
     switch (type) {
         case BOOKING_SUCCESS:
@@ -55,3 +55,5 @@ export default function(state = initialState, action) {
             return state;
     }
 }
+
+export default tickets

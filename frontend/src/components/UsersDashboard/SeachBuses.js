@@ -58,7 +58,7 @@ const SearchBuses = ({ searchbuses, getTickets }) => {
   return (
     <Fragment>
       <div className="row justify-content-center">
-      <button type="button" onClick={mybookings}><img style={{width: "200px"}} src={mybook} /></button>
+      <button type="button" onClick={mybookings}><img style={{width: "200px"}} src={mybook} alt="booking-img" /></button>
       </div>
       <div className="ticket my-5">
         <form className="form-row my-5 m-5" onSubmit={(e) => onSubmit(e)}>

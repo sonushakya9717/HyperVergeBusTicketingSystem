@@ -26,12 +26,12 @@ const Navbar = ({auth:{isAuthenticated},logout}) => {
   const guestLinks = (
     <ul>
     <li className="nav-item dropdown">
-        <a className="nav-link dropdown-toggle" id="navbarDropdown" href="#!" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button className="nav-link dropdown-toggle" id="navbarDropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Partner
-        </a>
+        </button>
         <div className="dropdown-menu bg-secondary" aria-labelledby="navbarDropdown">
-          <a className="dropdown-item" onClick={getAdminLogin}>Login</a>
-          <a className="dropdown-item" onClick={getAdminSignUp}>Register</a>
+          <button type="button" className="dropdown-item" onClick={getAdminLogin}>Login</button>
+          <button type="button" className="dropdown-item" onClick={getAdminSignUp}>Register</button>
           </div>
       </li>
 

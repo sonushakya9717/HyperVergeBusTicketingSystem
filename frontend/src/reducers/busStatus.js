@@ -6,7 +6,7 @@ import { STATUS_ERROR, GET_BUSSTATUS} from "../actions/types";
     error: {},
   };
   
-  export default (state = initialState, action) => {
+  const busStatus = (state = initialState, action) => {
     const { type, payload } = action;
   
     switch (type) {
@@ -27,3 +27,4 @@ import { STATUS_ERROR, GET_BUSSTATUS} from "../actions/types";
     }
   };
   
+  export default busStatus

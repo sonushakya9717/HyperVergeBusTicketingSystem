@@ -3,18 +3,18 @@ const Tickets = require("../models/Tickets");
 const { validationResult } = require("express-validator");
 const { allBookedTickets } = require("../utils/allBookedTickets");
 const nodemailer = require("nodemailer");
-const config = require('config');
-const user = config.get('user');
+const config = require("config");
+const user = config.get("user");
 const pass = config.get("pass");
+console.log(user)
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-  user,
-  pass
-  }
+    user,
+    pass,
+  },
 });
-
 
 const bookTickets = async (req, res) => {
   const errors = validationResult(req);
@@ -22,14 +22,15 @@ const bookTickets = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { seats_no, passengers, journeyDate, email,from,to, contactNo } = req.body;
+  const { seats_no, passengers, journeyDate, email, from, to, contactNo } =
+    req.body;
   const createTicket = {
     seats_no,
     passengers,
     journeyDate,
     contactNo,
     from,
-    to
+    to,
   };
 
   try {
@@ -41,7 +42,9 @@ const bookTickets = async (req, res) => {
 
     const allBookedSeats = await allBookedTickets(req.params.busId);
     if (isOutOfRange(seats_no, seats)) {
-      return res.status(400).json({ msg: "No such seats are available in the bus" });
+      return res
+        .status(400)
+        .json({ msg: "No such seats are available in the bus" });
     }
     let isBooked;
 
@@ -50,7 +53,6 @@ const bookTickets = async (req, res) => {
     });
 
     if (isBooked.length > 0) {
-
       return res.status(400).json({ msg: "seats are already booked" });
     }
 
@@ -58,83 +60,86 @@ const bookTickets = async (req, res) => {
     createTicket.busId = bus._id;
     const generateTicket = new Tickets(createTicket);
     await generateTicket.save();
+    let travelDate = new Date(generateTicket.journeyDate);
+    const month = travelDate.toLocaleString("default", { month: "short" });
+    const date = travelDate.getDate();
+    const year = travelDate.getFullYear();
+    const passengersData = generateTicket["seats_no"].map(
+      (seat, index) => `<tr>
+                  <td><b>${generateTicket.passengers[index].name} - ${seat}</b></td>
+                </tr>`
+    );
 
-//     var mailOptions = {
-//       from: 'kartik19@navgurukul.org',
-//       to: `${email}`,
-//       subject: "Tickets Status",
-//       html: `<p>Hello Deepak</p>
-//       <p> Your Ticket Detail </p>
-//       <div> 
-//         <Card className="container p-5">
-//         <Table bordered size="sm">
-//           <tbody>
-//             <tr>
-//               <td colSpan="2">
-//                 <b> From </b>New Delhi, Delhi
-//               </td>
-//             </tr>
-//              <tr>
-//               <td colSpan="2">
-//                <b> to </b> Dharamshala, Himachal pradesh
-//               </td>
-//             </tr>
-//             <tr>
-//               <td><b> Date of journey</b> </td>
-//               <td>5/8/2021</td>
-//             </tr>
-//             <tr>
-//               <td><b>Bus Name and Type</b></td>
-//               <td>Pucchi Travels semi sleeper AC bus</td>
-//             </tr>
-//             <tr>
-//               <td><b>Passenger Name</b></td>
-//               <td>Kartik</td>
-//             </tr>
-//             <tr>
-//               <td><b>Phone Number</b></td>
-//               <td>1236547891</td>
-//             </tr>
-//             <tr>
-//               <td><b>Seat Number</b></td>
-//               <td>1A</td>
-//             </tr>
-//             <tr>
-//               <td><b>Total Fare</b></td>
-//               <td>500</td>
-//             </tr>
-//             <tr>
-//               <td><b>Bus Number</b></td>
-//               <td>DL 1004 </td>
-//             </tr>
-//             <tr>
-//               <td><b>Departure Timing</b></td>
-//               <td>9PM</td>
-//             </tr>
-//           </tbody>
-//         </Table>
-//       </Card>
-//         </div>
-// `
-//     };
+    var mailOptions = {
+      from: user,
+      to: `${email}`,
+      subject: "You Ticket",
+      html: `<p><b>TravelSafe</b></p>
+      <p> Your Ticket Detail </p>
+      <div> 
+        <Card className="container p-5">
+        <Table bordered size="sm">
+          <tbody>
+            <tr>
+              <td colSpan="2">
+                <b> From </b>
+              </td>
+              <td>${generateTicket.from}</td>
+            </tr>
+             <tr>
+              <td colSpan="2">
+               <b> To </b>
+              </td>
+              <td> ${generateTicket.to} </td>
+            </tr>
+            <tr>
+            <td>
+            <b>Passengers</b>
+            <td>
+            </tr>
+            ${passengersData}
+            <tr>
+              <td><b> Date of journey</b> </td>
+              <td>${date} ${month} ${year}</td>
+            </tr>
+            <tr>
+              <td><b>Bus Name</b></td>
+              <td>${bus.busName}</td>
+            </tr>
+            <tr>
+              <td><b>Total Charges</b></td>
+              <td>Rs ${bus.fare*generateTicket["seats_no"].length}</td>
+            </tr>
+            <tr>
+              <td><b>Bus Number</b></td>
+              <td>${bus.vehicleNo}</td>
+            </tr>
+            <tr>
+              <td><b>Departure Timing</b></td>
+              <td>${bus.departureTime}</td>
+            </tr>
+          </tbody>
+        </Table>
+      </Card>
+        </div>
+`,
+    };
 
-    // transporter.sendMail(mailOptions, function(error, info){
-    //   if (error) {
-    //     console.log(error,"error")
-    //     return res.status(400).json({msg:"error"})
-    //   } else {
-    //     console.log('Email sent successfully: ');
-    //     return res.status(200).json(generateTicket);
-    //   }
-    // });
-    return res.status(200).json(generateTicket);
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error)
+        return res.status(400).json({msg:"Please enter correct Email Id"})
+      } else {
+        console.log('Email sent successfully: ');
+        return res.status(200).json(generateTicket);
+      }
+    });
+    // return res.status(200).json(generateTicket);
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ msg: "server error" });
   }
 };
-
-
-
 
 const isOutOfRange = (selected_seats, seats) => {
   var flag = true;
@@ -152,28 +157,32 @@ const isOutOfRange = (selected_seats, seats) => {
 };
 
 const cancelTickets = async (req, res) => {
-  try{
-    const ticket =await Tickets.findOne({_id:req.params.ticketId,userId:req.user.id})
-    if(!ticket){
-    return res.status(400).json({msg:"ticket not found"})
+  try {
+    const ticket = await Tickets.findOne({
+      _id: req.params.ticketId,
+      userId: req.user.id,
+    });
+    if (!ticket) {
+      return res.status(400).json({ msg: "ticket not found" });
     }
-    await Tickets.findOneAndDelete({_id:req.params.ticketId})
-    return res.status(200).json({msg:"ticket cancelled successfuly"})
-  }catch(err){
-    return res.status(500).json({msg:"server error"})
+    await Tickets.findOneAndDelete({ _id: req.params.ticketId });
+    return res.status(200).json({ msg: "ticket cancelled successfuly" });
+  } catch (err) {
+    return res.status(500).json({ msg: "server error" });
   }
-}
+};
 
-
-const getTickets = async(req, res, next) => {
-  const tickets = await Tickets.find({ userId: req.user.id }).populate('busId',['vehicleNo','departureTime']);
+const getTickets = async (req, res, next) => {
+  const tickets = await Tickets.find({ userId: req.user.id }).populate(
+    "busId",
+    ["vehicleNo", "departureTime"]
+  );
   if (!tickets.length) {
-      return next({ status: 400, errors: "You have not booked any ticket" });
+    return next({ status: 400, errors: "You have not booked any ticket" });
   }
 
   console.log(tickets);
   res.status(200).json(tickets);
 };
-
 
 module.exports = { bookTickets, cancelTickets, getTickets };

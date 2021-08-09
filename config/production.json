@@ -2,7 +2,5 @@
     "jwtSecret":"gaziabad123",
     "superAdmin":"60ebd2b4cdf2fe67565a5658",
     "mongoURL":"mongodb+srv://sonu123:g4WBWx6up7aYG6PV@tickets-system.pdjyj.mongodb.net/Tickets-system?retryWrites=true&w=majority",
-    "user": "sonu19@navgurukul.org",
-    "pass": "8800461382"
 }
 

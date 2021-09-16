@@ -1,13 +1,13 @@
 const User = require("../models/Users");
-const config = require("config");
+const config = require('config');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const { validationResult } = require("express-validator");
+require("dotenv").config()
 
 const getSignedJwtToken = function (
   payload,
-  secret = config.get("jwtSecret"),
+  secret = process.env.jwtsecret,
   expiresIn = 40000
 ) {
   return jwt.sign(payload, secret, { expiresIn });

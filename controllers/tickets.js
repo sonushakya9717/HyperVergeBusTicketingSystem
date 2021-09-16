@@ -4,9 +4,10 @@ const { validationResult } = require("express-validator");
 const { allBookedTickets } = require("../utils/allBookedTickets");
 const nodemailer = require("nodemailer");
 const config = require("config");
-const user = config.get("user");
-const pass = config.get("pass");
-console.log(user)
+const user = process.env.user
+const pass = process.env.pass
+require("dotenv").config()
+
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
